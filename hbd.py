@@ -4,12 +4,26 @@ import pygame
 import time
 import threading
 
-# Initialize pygame for music playback
-def play_music():
-    pygame.mixer.init()
-    pygame.mixer.music.load("happy_birthday.mp3")
-    pygame.mixer.music.play()
+import base64
 
+# Function to play background music using HTML
+def play_music(file_path="happy_birthday.mp3"):
+    with open(file_path, "rb") as f:
+        data = f.read()
+        b64 = base64.b64encode(data).decode()
+        md = f"""
+            <audio autoplay loop>
+                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+            </audio>
+            <style>
+                audio {{
+                    display: none;
+                }}
+            </style>
+        """
+        st.markdown(md, unsafe_allow_html=True)
+
+    
 # Set page config
 st.set_page_config(
     page_title="Happy Birthday!",
@@ -39,7 +53,7 @@ if not st.session_state.lights_on:
 # Start the greeting only when the lights are turned on
 if st.session_state.lights_on:
     # Start music in a separate thread
-    threading.Thread(target=play_music, daemon=True).start()
+    play_music()
 
     # Create a placeholder for dynamic text
     placeholder = st.empty()
